@@ -22,6 +22,11 @@ export class Task {
   })
   status: TaskStatus;
 
+  @Column({
+    default: false,
+  })
+  isDeleted: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 }
