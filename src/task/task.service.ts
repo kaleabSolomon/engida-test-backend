@@ -11,8 +11,23 @@ export class TaskService {
     @InjectRepository(Task) private taskRepository: Repository<Task>,
   ) {}
 
-  async getTasks() {
-    return this.taskRepository.find();
+  async getTasks(page, limit) {
+    const take = limit;
+    const skip = (page - 1) * limit;
+    const tasks = await this.taskRepository.find({ skip, take });
+
+    const tasksCount = await this.taskRepository.count();
+    return createApiResponse({
+      status: 'success',
+      message: 'Fetched Tasks Successfully.',
+      data: tasks,
+      metadata: {
+        totalItems: tasksCount,
+        totalPages: Math.ceil(tasksCount / limit),
+        pageSize: limit,
+        currentPage: page,
+      },
+    });
   }
 
   async createTask(dto: CreateTaskDto) {
