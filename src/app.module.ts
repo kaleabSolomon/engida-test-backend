@@ -6,6 +6,7 @@ import { Task } from './task/entities/task.entity';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AtGuard } from './auth/guards';
+import { User } from './auth/entities/user.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { AtGuard } from './auth/guards';
         url: configService.get<string>('DATABASE_URL'),
         autoLoadEntities: true,
         synchronize: true,
-        entities: [Task],
+        entities: [Task, User],
       }),
     }),
 
