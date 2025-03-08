@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { TaskModule } from './task/task.module';
 import { Task } from './task/entities/task.entity';
 import { AuthModule } from './auth/auth.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AtGuard } from './auth/guards';
 
 @Module({
   imports: [
@@ -26,6 +28,11 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AtGuard,
+    },
+  ],
 })
 export class AppModule {}
