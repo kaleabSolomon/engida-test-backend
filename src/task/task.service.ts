@@ -1,9 +1,14 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
 import { Repository } from 'typeorm';
-import { CreateTaskDto } from './dto/createTask.dto';
+import { CreateTaskDto } from './dto';
 import { createApiResponse } from 'src/utils/createApiRes';
+import { UpdateTaskDto } from './dto';
 
 @Injectable()
 export class TaskService {
@@ -44,6 +49,49 @@ export class TaskService {
       });
     } catch (err) {
       console.log(err);
+      throw new InternalServerErrorException(err);
+    }
+  }
+
+  async updateTask(id: string, dto: UpdateTaskDto) {
+    try {
+      const task = await this.taskRepository.findOne({ where: { id } });
+
+      if (!task) {
+        throw new NotFoundException(`Task not found`);
+      }
+
+      await this.taskRepository.update(id, dto);
+      const updatedTask = await this.taskRepository.findOne({ where: { id } });
+
+      return createApiResponse({
+        status: 'success',
+        message: 'Task updated successfully',
+        data: updatedTask,
+      });
+    } catch (err) {
+      console.error(err);
+      throw new InternalServerErrorException(err);
+    }
+  }
+
+  async deleteTask(id: string) {
+    try {
+      const task = await this.taskRepository.findOne({ where: { id } });
+
+      if (!task) {
+        throw new NotFoundException(`Task not found`);
+      }
+
+      await this.taskRepository.update(id, { isDeleted: true });
+
+      return createApiResponse({
+        status: 'success',
+        message: 'Task deleted successfully',
+        data: null,
+      });
+    } catch (err) {
+      console.error(err);
       throw new InternalServerErrorException(err);
     }
   }
