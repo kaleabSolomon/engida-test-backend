@@ -1,0 +1,19 @@
+services:
+  jot-api:
+    container_name: jotAPI
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3333:3333'
+    environment:
+      - PORT=3333
+      - NODE_ENV=Prod
+    volumes:
+      - .:/usr/src/app
+    networks:
+      - jotNet
+volumes:
+  pg_data:
+networks:
+  jotNet:
