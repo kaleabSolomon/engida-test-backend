@@ -10,6 +10,9 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+  app.enableCors({
+    origin: ['https://jot-eta.vercel.app'],
+  });
   await app.listen(3333);
 }
 bootstrap();
