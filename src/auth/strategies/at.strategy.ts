@@ -17,7 +17,9 @@ export class AtStrategy extends PassportStrategy(Strategy, 'jwt') {
   async validate(payload: any) {
     const user: userReq = {
       userId: payload.sub,
-      email: payload.identifier,
+      email: payload.email,
+      firstName: payload.firstName,
+      lastName: payload.lastName,
     };
 
     return user;

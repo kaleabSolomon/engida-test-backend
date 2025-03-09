@@ -41,7 +41,12 @@ export class AuthService {
 
     if (!savedUser) throw new ConflictException('Failed to create user');
 
-    const token = await this.generateTokens(savedUser.id, savedUser.email);
+    const token = await this.generateTokens(
+      savedUser.id,
+      savedUser.email,
+      savedUser.firstName,
+      savedUser.lastName,
+    );
 
     return token;
   }
@@ -55,7 +60,12 @@ export class AuthService {
     const pwMatches = await argon.verify(user[0].password, password);
     if (!pwMatches) throw new ForbiddenException('Incorrect Credentials');
 
-    const token = await this.generateTokens(user[0].id, user[0].email);
+    const token = await this.generateTokens(
+      user[0].id,
+      user[0].email,
+      user[0].firstName,
+      user[0].lastName,
+    );
 
     return token;
   }
@@ -64,10 +74,15 @@ export class AuthService {
     return await argon.hash(data);
   }
 
-  async generateTokens(userId: string, email: string) {
+  async generateTokens(
+    userId: string,
+    email: string,
+    firstName: string,
+    lastName: string,
+  ) {
     try {
       const at = this.jwtService.sign(
-        { sub: userId, email },
+        { sub: userId, email, firstName, lastName },
         {
           secret: this.config.get('AT_SECRET'),
           expiresIn: this.config.get('AT_EXPIRESIN'),
