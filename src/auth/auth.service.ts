@@ -1,12 +1,13 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
-import { SignupDto } from './dto';
+import { SigninDto, SignupDto } from './dto';
 import * as argon from 'argon2';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -41,6 +42,20 @@ export class AuthService {
     if (!savedUser) throw new ConflictException('Failed to create user');
 
     const token = await this.generateTokens(savedUser.id, savedUser.email);
+
+    return token;
+  }
+
+  async signin(dto: SigninDto) {
+    const { email, password } = dto;
+    const user = await this.userRepository.findBy({ email });
+    if (user.length !== 1)
+      throw new ForbiddenException('Incorrect Credentials');
+
+    const pwMatches = await argon.verify(user[0].password, password);
+    if (!pwMatches) throw new ForbiddenException('Incorrect Credentials');
+
+    const token = await this.generateTokens(user[0].id, user[0].email);
 
     return token;
   }
