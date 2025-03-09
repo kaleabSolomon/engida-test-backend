@@ -19,11 +19,10 @@ export class AuthService {
     private config: ConfigService,
     private jwtService: JwtService,
   ) {}
-
+  // signup method
   async signup(dto: SignupDto) {
     const { email, password, firstName, lastName } = dto;
     const user = await this.userRepository.findBy({ email });
-    console.log(user.length > 0);
     if (user.length > 0)
       throw new ConflictException(
         'An Account is already registered with the given email. please Log in or register using a different email',
@@ -50,7 +49,7 @@ export class AuthService {
 
     return token;
   }
-
+  // signin method
   async signin(dto: SigninDto) {
     const { email, password } = dto;
     const user = await this.userRepository.findBy({ email });
@@ -70,10 +69,12 @@ export class AuthService {
     return token;
   }
 
+  // Hashing method that takes in a string and returns a hashed string
   async hashData(data: string): Promise<string> {
     return await argon.hash(data);
   }
 
+  // Token Generatator that takes in the user details and generates a token
   async generateTokens(
     userId: string,
     email: string,

@@ -23,9 +23,7 @@ import { User } from './auth/entities/user.entity';
         entities: [Task, User],
       }),
     }),
-
     TaskModule,
-
     AuthModule,
   ],
   controllers: [],

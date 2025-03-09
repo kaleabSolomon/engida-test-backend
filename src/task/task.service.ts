@@ -16,6 +16,7 @@ export class TaskService {
     @InjectRepository(Task) private taskRepository: Repository<Task>,
   ) {}
 
+  // method to get tasks allows for pagination
   async getTasks(userId: string, page: number, limit: number) {
     const take = limit;
     const skip = (page - 1) * limit;
@@ -40,7 +41,7 @@ export class TaskService {
       },
     });
   }
-
+  // method to create a task
   async createTask(userId: string, dto: CreateTaskDto) {
     try {
       const task = this.taskRepository.create({
@@ -60,6 +61,7 @@ export class TaskService {
     }
   }
 
+  // method to update task thattakes in the id of the task and a partial task object
   async updateTask(userId: string, id: string, dto: UpdateTaskDto) {
     try {
       const task = await this.taskRepository.findOne({
@@ -84,6 +86,7 @@ export class TaskService {
     }
   }
 
+  // method to delete a task: performs soft delete by setting isDeleted to true
   async deleteTask(userId: string, id: string) {
     try {
       const task = await this.taskRepository.findOne({
