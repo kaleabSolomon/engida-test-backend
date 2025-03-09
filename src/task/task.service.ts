@@ -16,12 +16,18 @@ export class TaskService {
     @InjectRepository(Task) private taskRepository: Repository<Task>,
   ) {}
 
-  async getTasks(page, limit) {
+  async getTasks(userId: string, page: number, limit: number) {
     const take = limit;
     const skip = (page - 1) * limit;
-    const tasks = await this.taskRepository.find({ skip, take });
+    const tasks = await this.taskRepository.find({
+      where: { user: { id: userId } },
+      skip,
+      take,
+    });
 
-    const tasksCount = await this.taskRepository.count();
+    const tasksCount = await this.taskRepository.count({
+      where: { user: { id: userId } },
+    });
     return createApiResponse({
       status: 'success',
       message: 'Fetched Tasks Successfully.',
@@ -35,10 +41,11 @@ export class TaskService {
     });
   }
 
-  async createTask(dto: CreateTaskDto) {
+  async createTask(userId: string, dto: CreateTaskDto) {
     try {
       const task = this.taskRepository.create({
         ...dto,
+        user: { id: userId },
       });
 
       const savedTask = await this.taskRepository.save(task);
@@ -53,9 +60,11 @@ export class TaskService {
     }
   }
 
-  async updateTask(id: string, dto: UpdateTaskDto) {
+  async updateTask(userId: string, id: string, dto: UpdateTaskDto) {
     try {
-      const task = await this.taskRepository.findOne({ where: { id } });
+      const task = await this.taskRepository.findOne({
+        where: { id, user: { id: userId } },
+      });
 
       if (!task) {
         throw new NotFoundException(`Task not found`);
@@ -75,9 +84,11 @@ export class TaskService {
     }
   }
 
-  async deleteTask(id: string) {
+  async deleteTask(userId: string, id: string) {
     try {
-      const task = await this.taskRepository.findOne({ where: { id } });
+      const task = await this.taskRepository.findOne({
+        where: { id, user: { id: userId } },
+      });
 
       if (!task) {
         throw new NotFoundException(`Task not found`);
